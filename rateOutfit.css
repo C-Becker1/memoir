@@ -1,0 +1,66 @@
+.container {
+    background-color: #e9ecef;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 5px;
+}
+
+.right {
+    position: absolute;
+    right: 0;
+    padding-right: 1rem;
+}
+
+.icon {
+    padding-right: 0.4rem;
+}
+
+.card {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    margin-bottom: 1rem;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-image-cloth {
+    display: inline;
+    vertical-align: middle;
+}
+
+.card > img {
+    height: 200px;
+    padding-left: 1rem;
+}
+
+.selector {
+    width: 100%;
+}
+
+.outfit-desc {
+    color: #343a40;
+}
+
+.flex-container {
+    display: flex;
+    flex-direction: row;
+    align-items: end;
+    justify-content: end;
+}
+.submitButton {
+    margin-top: 1rem;
+}
+
+
+
+.categoria {
+    display: flex;
+    flex-direction: column;
+}
+
+.p-left {
+    padding-left: 3rem;
+}
