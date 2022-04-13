@@ -56,11 +56,11 @@ function loadUpdateButton() {
 
 
 async function loadOutfitWithOpinion(id) {
-    response = await fetch(`http://localhost:3000/outfit-opinions/${id}`).then(response => response.json())
+    response = await fetch(`http://10.6.41.56:3000/outfit-opinions/${id}`).then(response => response.json())
     response = response.message[0]
     console.log(response)
     
-    temp = await fetch(`http://localhost:3000/cloth-opinion/${userId}/${response.ID_Outfit}`).then(response => response.json())
+    temp = await fetch(`http://10.6.41.56/cloth-opinion/${userId}/${response.ID_Outfit}`).then(response => response.json())
     response.clothes = temp.message
     // currentOutfit = response
     console.log(":DDD", response)
@@ -213,9 +213,10 @@ async function handleSubmit(isUpdate) {
 
 function generateCard(data) {
     let id = data.ID != undefined ? data.ID : ''
+    data.Name = data.Name.split("-")[0] 
     newCard = `
     <div class="card" data-clothId="${data.ID_Cloth}" data-rId=${id}>
-        <img src="${data.IMG_Route}" class="card-img-cloth" alt="${data.Name}">
+        <img src="./images/img/${data.IMG_Route}" class="card-img-cloth" alt="${data.Name}">
         <div class="card-body">
             <h5 class="card-title">${data.Name}</h5>
             <p class="card-text">${data.Description}.</p>
@@ -240,19 +241,19 @@ function generateCard(data) {
             ¿En qué climas utilizaría esta prenda?
             <div class="categoria" id="clothWeatherClassification_${data.ID_Cloth}" data-clothId="${data.ID_Cloth}">
               <label class="p-left">
-                <input class="categoriaCheckbox" type="checkbox" value="1"> Categoría 1
+                <input class="categoriaCheckbox" type="checkbox" value="1"> Frío
               </label>
               <label class="p-left">
-                <input class="categoriaCheckbox" type="checkbox" value="2"> Categoría 2
+                <input class="categoriaCheckbox" type="checkbox" value="2"> Lluvioso
               </label>
               <label class="p-left">
-                <input class="categoriaCheckbox" type="checkbox" value="3"> Categoría 3
+                <input class="categoriaCheckbox" type="checkbox" value="3"> Húmedo
               </label>
               <label class="p-left">
-                <input class="categoriaCheckbox" type="checkbox" value="4"> Categoría 4
+                <input class="categoriaCheckbox" type="checkbox" value="4"> Templado
               </label>
               <label class="p-left">
-                <input class="categoriaCheckbox" type="checkbox" value="5"> Categoría 5
+                <input class="categoriaCheckbox" type="checkbox" value="5"> Caluroso
               </label>
             </div>
             
@@ -263,7 +264,7 @@ function generateCard(data) {
 }
 
 async function loadOutfits() {
-    response = await fetch(`http://localhost:3000/outfits`)
+    response = await fetch(`http://10.6.41.56:3000/outfits`)
     .then(response => response.json()).then(response => response.message)
     
     return response
@@ -300,7 +301,7 @@ async function loadCards(outfit) {
 }
 
 async function loadOutfit(outfit) {
-    let response = await fetch(`http://localhost:3000/outfits/${outfit.ID}`)
+    let response = await fetch(`http://10.6.41.56:3000/outfits/${outfit.ID}`)
     .then(response => response.json())
 
     outfit.clothes = response.message
@@ -354,7 +355,7 @@ async function hasOpinated() {
     console.log(outfitData)
     let idOutfit = outfitData.dataset.outfitId
     console.log("id outfit:", idOutfit)
-    let response = await fetch(`http://localhost:3000/outfit-opinion/${userId}/${idOutfit}`).then(response => response.json())
+    let response = await fetch(`http://10.6.41.56:3000/outfit-opinion/${userId}/${idOutfit}`).then(response => response.json())
     console.log("response:", response)
     
     return response.message.status
