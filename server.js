@@ -181,7 +181,10 @@ app.get('/relClothOutfit/:idOutfit', (req, res) => {
 /*** User ***/
 app.get('/login/:username/:password', (req, res) => {
     pool.query(`SELECT * FROM user WHERE username = "${req.params.username}" AND password = "${req.params.password}"`, (error, results, fields) => {
-        if (error) throw error
+        if (error) {
+            console.log("Error en login:", error)
+            throw error
+        }
         if (results.length > 0)
             res.send({state: "success", message: results})
         else 
