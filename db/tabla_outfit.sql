@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS srg.`outfit` (
   `Name` varchar(50) DEFAULT NULL,
   `Description` varchar(200) DEFAULT NULL,
   PRIMARY KEY (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Información de cada outfit';
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COMMENT='Información de cada outfit';
 
 -- La exportación de datos fue deseleccionada.
 

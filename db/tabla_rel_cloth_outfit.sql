@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS srg.`rel_cloth_outfit` (
   PRIMARY KEY (`ID`),
   KEY `ID_Outfit` (`ID_Outfit`),
   KEY `ID_Cloth` (`ID_Cloth`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Tabla de relaciones entre prendas y outfits';
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COMMENT='Tabla de relaciones entre prendas y outfits';
 
 -- La exportación de datos fue deseleccionada.
 

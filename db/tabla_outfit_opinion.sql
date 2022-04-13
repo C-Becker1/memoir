@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS srg.`outfit_opinion` (
   PRIMARY KEY (`ID`),
   KEY `ID_Outfit` (`ID_Outfit`),
   KEY `ID_User` (`ID_User`)
-) ENGINE=InnoDB AUTO_INCREMENT=77 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Opinion de un usuario sobre un outfit';
+) ENGINE=InnoDB AUTO_INCREMENT=77 DEFAULT CHARSET=utf8mb4 COMMENT='Opinion de un usuario sobre un outfit';
 
 -- La exportación de datos fue deseleccionada.
 
