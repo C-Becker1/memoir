@@ -22,8 +22,13 @@ const config = {
     database: process.env.DB_NAME
 }
 
-pool = mysql.createPool(config)
+try {
+    pool = mysql.createPool(config)
+} 
+catch {
+    console.log("Ocurrió un error")
 
+}
 app.use(express.json())
 
 
