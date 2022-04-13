@@ -13,7 +13,7 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 -- Volcando estructura para tabla memoria.outfit
-CREATE TABLE IF NOT EXISTS `outfit` (
+CREATE TABLE IF NOT EXISTS srg.`outfit` (
   `ID` int NOT NULL AUTO_INCREMENT,
   `Name` varchar(50) DEFAULT NULL,
   `Description` varchar(200) DEFAULT NULL,
