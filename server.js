@@ -22,13 +22,17 @@ const config = {
     database: process.env.DB_NAME
 }
 
-try {
-    pool = mysql.createPool(config)
-} 
-catch {
-    console.log("Ocurrió un error")
 
-}
+pool = mysql.createPool(config)
+pool.getConnection((err, conn) => {
+    if (err) {
+        console.log(`Ocurrió un error: ${err}`)
+    }
+    else {
+        console.log("Conexión realizada!")
+    }
+})
+
 app.use(express.json())
 
 
