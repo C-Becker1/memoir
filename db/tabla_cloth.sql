@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS srg.`cloth` (
   `Loose` bit(1) DEFAULT NULL,
   `Conventional` bit(1) DEFAULT NULL,
   PRIMARY KEY (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=20001 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Información de las prendas';
+) ENGINE=InnoDB AUTO_INCREMENT=20001 DEFAULT CHARSET=utf8mb4 COMMENT='Información de las prendas';
 
 -- La exportación de datos fue deseleccionada.
 
