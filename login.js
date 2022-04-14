@@ -7,7 +7,7 @@ password = document.getElementById("password")
 
 function handleLoginButton() {
 
-    fetch(`http://localhost:3000/login/${username.value}/${password.value}`)
+    fetch(`https://localhost:3000/login/${username.value}/${password.value}`)
     .then(response => response.json())
     .then(data => {
         console.log("data:", data)
@@ -25,5 +25,4 @@ function handleLoginButton() {
             errors.style.display = 'block'
         }
     })
-
 }
