@@ -191,8 +191,10 @@ app.get('/login/:username/:password', (req, res) => {
             console.log("Error en login:", error)
             throw error
         }
-        if (results.length > 0)
+        if (results.length > 0) {
+            console.log("results:", results)
             res.send({state: "success", message: results})
+        }
         else 
             res.send({state: "error"})
     })
