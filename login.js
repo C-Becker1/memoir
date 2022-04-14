@@ -6,8 +6,8 @@ password = document.getElementById("password")
 // data = {username: "Becker", password: "123456"}
 
 async function handleLoginButton() {
-
-    response = await getData(url="https://10.6.41.56:3000/login/", username.value, password.value)
+    //https://10.6.41.56:3000
+    response = await getData(url="http://localhost:3000/login/", username.value, password.value)
     console.log(response)
     response.then(response => response.json())
     .then(data => {
