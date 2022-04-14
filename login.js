@@ -8,7 +8,7 @@ password = document.getElementById("password")
 const isDevelopment = true
 
 function handleLoginButton() {
-    url = "https://localhost:3000"
+    url = "https://10.6.41.56:3000"
     if (isDevelopment) {
         url = "http://localhost:3000"
     }
