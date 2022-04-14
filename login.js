@@ -5,10 +5,11 @@ username = document.getElementById("username")
 password = document.getElementById("password")
 // data = {username: "Becker", password: "123456"}
 
-function handleLoginButton() {
+async function handleLoginButton() {
 
-    fetch(`https://10.6.41.56:3000/login/${username.value}/${password.value}`)
-    .then(response => response.json())
+    response = await getData(url="https://10.6.41.56:3000/login/", username.value, password.value)
+    console.log(response)
+    response.then(response => response.json())
     .then(data => {
         console.log("data:", data)
         if (data.state === 'success') {
@@ -28,4 +29,26 @@ function handleLoginButton() {
 
     //console.log("WENA QLA")
 
+}
+
+
+
+// Example GET method implementation:
+async function getData(url = '', username, password) {
+    // Default options are marked with *
+    url = `${url}${username}/${password}`
+    const response = await fetch(url, {
+        method: 'GET', // *GET, POST, PUT, DELETE, etc.
+        mode: 'cors', // no-cors, *cors, same-origin
+        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+        credentials: 'same-origin', // include, *same-origin, omit
+        headers: {
+          'Content-Type': 'application/json'
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        redirect: 'follow', // manual, *follow, error
+        referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+        body: JSON.stringify(data) // body data type must match "Content-Type" header
+    });
+    return response
 }

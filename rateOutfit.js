@@ -344,6 +344,8 @@ async function putData(url = '', data = {}) {
     return response.json(); 
 }
 
+
+
 function logOut() {
     sessionStorage.removeItem('sessionKey');
     location.href = "/login.html"
