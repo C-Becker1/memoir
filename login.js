@@ -7,7 +7,7 @@ password = document.getElementById("password")
 
 function handleLoginButton() {
 
-    fetch(`http://10.6.41.56:3000/login/${username.value}/${password.value}`)
+    fetch(`https://10.6.41.56:3000/login/${username.value}/${password.value}`)
     .then(response => response.json())
     .then(data => {
         console.log("data:", data)
