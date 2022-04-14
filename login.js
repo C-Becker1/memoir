@@ -5,9 +5,16 @@ username = document.getElementById("username")
 password = document.getElementById("password")
 // data = {username: "Becker", password: "123456"}
 
-function handleLoginButton() {
+const isDevelopment = true
 
-    fetch(`https://localhost:3000/login/${username.value}/${password.value}`)
+function handleLoginButton() {
+    url = "https://localhost:3000"
+    if (isDevelopment) {
+        url = "http://localhost:3000"
+    }
+
+
+    fetch(`${url}/login/${username.value}/${password.value}`)
     .then(response => response.json())
     .then(data => {
         console.log("data:", data)
