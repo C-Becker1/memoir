@@ -1,11 +1,16 @@
 require('dotenv').config({ path: __dirname + '/.env' })
 
 const express = require('express')
-const res = require('express/lib/response')
 const app = express()
 var cors = require('cors')
 
 app.use(cors())
+
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+  });
 
 const mysql = require('mysql')
 var db = mysql.createConnection({
