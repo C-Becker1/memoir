@@ -1,4 +1,11 @@
 
+const isDevelopment = true
+
+url = "https//10.6.41.56:3000"
+if (isDevelopment) {
+    url = "https://localhost:3000"
+}
+
 if (sessionStorage.getItem('sessionKey')) {
     userId = sessionStorage.getItem('sessionKey')
 
@@ -56,11 +63,11 @@ function loadUpdateButton() {
 
 
 async function loadOutfitWithOpinion(id) {
-    response = await fetch(`http://10.6.41.56:3000/outfit-opinions/${id}`).then(response => response.json())
+    response = await fetch(`${url}/outfit-opinions/${id}`).then(response => response.json())
     response = response.message[0]
     console.log(response)
     
-    temp = await fetch(`http://10.6.41.56/cloth-opinion/${userId}/${response.ID_Outfit}`).then(response => response.json())
+    temp = await fetch(`${url}/cloth-opinion/${userId}/${response.ID_Outfit}`).then(response => response.json())
     response.clothes = temp.message
     // currentOutfit = response
     console.log(":DDD", response)
@@ -157,11 +164,11 @@ async function handleSubmit(isUpdate) {
             //actualizar
             console.log("Estoy actualizando")
             data.ID = idOpinion
-            await putData('http://localhost:3000/outfit-opinion', data)
+            await putData(`${url}/outfit-opinion`, data)
     
         }
         else
-            await postData('http://localhost:3000/outfit-opinion', data)
+            await postData(`${url}/outfit-opinion`, data)
     } )
     
 
@@ -188,10 +195,10 @@ async function handleSubmit(isUpdate) {
                 console.log(cardList.children[i].dataset.rid)
                 data.ID = cardList.children[i].dataset.rid
             
-                await putData('http://localhost:3000/cloth-opinion', data)
+                await putData(`${ruta}/cloth-opinion`, data)
             }
             else
-                await postData('http://localhost:3000/cloth-opinion', data)
+                await postData(`${url}/cloth-opinion`, data)
         })
     }
 
@@ -216,7 +223,7 @@ function generateCard(data) {
     data.Name = data.Name.split("-")[0] 
     newCard = `
     <div class="card" data-clothId="${data.ID_Cloth}" data-rId=${id}>
-        <img src="./images/img/${data.IMG_Route}" class="card-img-cloth" alt="${data.Name}">
+        <img src="../data/Generador de Conjuntos/images/img/${data.IMG_Route}" class="card-img-cloth" alt="${data.Name}">
         <div class="card-body">
             <h5 class="card-title">${data.Name}</h5>
             <p class="card-text">${data.Description}.</p>
@@ -264,7 +271,7 @@ function generateCard(data) {
 }
 
 async function loadOutfits() {
-    response = await fetch(`http://10.6.41.56:3000/outfits`)
+    response = await fetch(`${url}/outfits`)
     .then(response => response.json()).then(response => response.message)
     
     return response
@@ -301,7 +308,7 @@ async function loadCards(outfit) {
 }
 
 async function loadOutfit(outfit) {
-    let response = await fetch(`http://10.6.41.56:3000/outfits/${outfit.ID}`)
+    let response = await fetch(`${url}/outfits/${outfit.ID}`)
     .then(response => response.json())
 
     outfit.clothes = response.message
@@ -357,7 +364,7 @@ async function hasOpinated() {
     console.log(outfitData)
     let idOutfit = outfitData.dataset.outfitId
     console.log("id outfit:", idOutfit)
-    let response = await fetch(`http://10.6.41.56:3000/outfit-opinion/${userId}/${idOutfit}`).then(response => response.json())
+    let response = await fetch(`${url}/outfit-opinion/${userId}/${idOutfit}`).then(response => response.json())
     console.log("response:", response)
     
     return response.message.status
@@ -367,6 +374,3 @@ async function hasOpinated() {
         }
     
 }
-
-
- 

@@ -2,6 +2,8 @@ require('dotenv').config({ path: __dirname + '/.env' })
 
 const express = require('express')
 const app = express()
+const https = require('https')
+const fs = require('fs')
 var cors = require('cors')
 
 app.use(cors())
@@ -201,7 +203,12 @@ app.get('/login/:username/:password', (req, res) => {
 })
 /**************/
 
-const server = app.listen(3000, (error) => {
+https
+    .createServer({
+        key: fs.readFileSync("key.pem"),
+        cert: fs.readFileSync("cert.pem") 
+    }, app)
+    .listen(3000, (error) => {
     if (error) return console.log(`Error: ${error}`)
 
     console.log("Server started")
