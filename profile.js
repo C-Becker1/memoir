@@ -11,12 +11,21 @@ else
 async function loadOpinatedOutfits() {
     tbody = document.querySelector(".tbody")
     tbody.innerHTML = ""
-    let response = await fetch(`http://localhost:3000/outfit-opinion/${userId}`).then(response => response.json())
+    let response = await fetch(`${API_URL}/outfit-opinion/${userId}`).then(response => response.json())
     response = response.message
     console.log("repsonse:",response)
     response.forEach(data => {
         tbody.innerHTML += generateRow(data)
     })
+    let cantRegistros = document.querySelector(".table-end")
+    
+    let s = "s"
+    if (response.length == 1) {
+        s = ""
+    }
+    let texto = `mostrando ${response.length} registro${s}...`
+    cantRegistros.innerText = texto
+    console.log(response.length)
 }
 
 
@@ -62,15 +71,15 @@ async function updateOutfitOpinion(id) {
 async function deleteOutfitOpinion(id) {
     deleteButton = document.getElementById(`delete_${id}`)
     idOutfit = deleteButton.dataset.outfitid
-    response = await fetch(`http://localhost:3000/outfits/${idOutfit}`).then(response => response.json())
+    response = await fetch(`${API_URL}/outfits/${idOutfit}`).then(response => response.json())
     response = response.message
     // console.log(response)
 
     response.forEach(cloth => { 
-        fetch(`http://localhost:3000/cloth-opinion/${userId}/${idOutfit}/${cloth.ID_Cloth}`, {method: 'DELETE'}).then(response => response.json())
+        fetch(`${API_URL}/cloth-opinion/${userId}/${idOutfit}/${cloth.ID_Cloth}`, {method: 'DELETE'}).then(response => response.json())
     })
 
-    fetch(`http://localhost:3000/outfit-opinion/${id}`, {
+    fetch(`${API_URL}/outfit-opinion/${id}`, {
         method: 'DELETE',
     }).then(response => { response.json(); loadOpinatedOutfits() })
 
@@ -83,7 +92,7 @@ function logOut() {
 }
 
 async function loadOutfit(outfit) {
-    let response = await fetch(`http://localhost:3000/outfits/${outfit.ID}`)
+    let response = await fetch(`${API_URL}/${outfit}outfits/${outfit.ID}`)
     .then(response => response.json())
     //.then(data => data)
     //.then(data => {

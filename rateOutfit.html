@@ -7,6 +7,7 @@
     <title>Sistema de Muestreo | Memoria</title>
     <link rel="icon" type="image/x-icon" href="./favicon-32x32.png">
 
+    <script src="./common.js"></script>
     <script src="./profile.js" defer></script>
     <script src="./rateOutfit.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
@@ -91,24 +92,34 @@
             -->
             <br/>
             ¿A qué categoría de clima estaría orientado el atuendo como conjunto?
+          </center>
             <div class="categoria" id="outfitWeatherClassification">
-              <label>
-                <input class="messageCheckbox" type="checkbox" value="1"> Frío
-              </label>
-              <label>
-                <input class="messageCheckbox" type="checkbox" value="2"> Lluvioso
-              </label>
-              <label>
-                <input class="messageCheckbox" type="checkbox" value="3"> Húmedo
-              </label>
-              <label>
-                <input class="messageCheckbox" type="checkbox" value="4"> Templado
-              </label>
-              <label>
-                <input class="messageCheckbox" type="checkbox" value="5"> Caluroso
-              </label>
+              <div class="category-checkbox">
+                <label>
+                  <input class="messageCheckbox" type="checkbox" value="1"> Frío
+                </label>
+              </div>
+              <div class="category-checkbox">
+                <label>
+                  <input class="messageCheckbox" type="checkbox" value="2"> Lluvioso
+                </label>
+              </div>
+              <div class="category-checkbox">
+                <label>
+                  <input class="messageCheckbox" type="checkbox" value="3"> Húmedo
+                </label>
+              </div>
+              <div class="category-checkbox">
+                <label>
+                  <input class="messageCheckbox" type="checkbox" value="4"> Templado
+                </label>
+              </div>
+              <div class="category-checkbox">
+                <label>
+                  <input class="messageCheckbox" type="checkbox" value="5"> Caluroso
+                </label>
+              </div>
             </div>
-            </center>
             
             <div class="flex-container" flex-container>
                 <button type="button" class="btn btn-secondary submitButton" onclick="handleSubmit(false)">Envíar</button>

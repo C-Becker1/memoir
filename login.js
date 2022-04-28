@@ -5,16 +5,10 @@ username = document.getElementById("username")
 password = document.getElementById("password")
 // data = {username: "Becker", password: "123456"}
 
-const isDevelopment = true
 
 function handleLoginButton() {
-    url = "https//10.6.41.56:3000"
-    if (isDevelopment) {
-        url = "https://localhost:3000"
-    }
-
-
-    fetch(`${url}/login/${username.value}/${password.value}`)
+    console.log("API_URL",)
+    fetch(`${API_URL}/login/${username.value}/${password.value}`)
     .then(response => response.json())
     .then(data => {
         console.log("data:", data)

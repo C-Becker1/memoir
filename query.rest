@@ -1,1 +1,17 @@
-GET https://localhost:3000/login/becker/123456 
+GET https://sebastian-rg.com/api/login/becker/123456 
+
+
+
+###
+
+GET https://sebastian-rg.com/api/outfits
+
+###
+
+GET https://localhost:3000/outfits/48
+
+###
+
+PUT http://localhost:3000/cloth-opinion/
+
+

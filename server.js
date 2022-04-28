@@ -2,17 +2,18 @@ require('dotenv').config({ path: __dirname + '/.env' })
 
 const express = require('express')
 const app = express()
-const https = require('https')
-const fs = require('fs')
+
 var cors = require('cors')
 
-app.use(cors())
+app.use(cors({origin: process.env.REMOTE_CLIENT_APP, credentials: true}))
 
 app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Methods", "*");
+
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
-  });
+});
 
 const mysql = require('mysql')
 var db = mysql.createConnection({
@@ -56,14 +57,14 @@ app.get('/clothes', (req, res) => {
 app.get('/clothes/:id', (req, res) => {
     pool.query(`SELECT * FROM cloth WHERE id = ${req.params.id}`, (error, results, fields) => {
         if (error) throw error
-
-        res.send({message: results})
+        result = getClothsWithAttributes(results)
+        res.send({message: result})
     } )
 })
 
 
 app.post('/cloth-opinion', (req, res) => {
-    values = `${req.body.idCloth}, ${req.body.idUser}, ${req.body.weatherClassification}, ${req.body.goodLooksCalification}, ${req.body.idOutfit}`
+    values = `${req.body.idCloth}, ${req.body.idUser}, "${req.body.weatherClassification}", ${req.body.goodLooksCalification}, ${req.body.idOutfit}`
     pool.query(`INSERT INTO cloth_opinion (ID_Cloth, ID_User, Weather_Classification, GoodLooks_Calification, ID_Outfit) VALUES (${values})`, (error, results, fields) => {
         if (error) throw error
         
@@ -72,8 +73,9 @@ app.post('/cloth-opinion', (req, res) => {
 })
 
 app.put('/cloth-opinion', (req, res) => {
-    values = `${req.body.idCloth}, ${req.body.idUser}, ${req.body.weatherClassification}, ${req.body.goodLooksCalification}, ${req.body.idOutfit}`
-    pool.query(`UPDATE cloth_opinion SET Weather_Classification = ${req.body.weatherClassification}, GoodLooks_Calification = ${req.body.goodLooksCalification} WHERE ID = ${req.body.ID}`, (error, results, fields) => {
+    values = `${req.body.idCloth}, ${req.body.idUser}, "${req.body.weatherClassification}", ${req.body.goodLooksCalification}, ${req.body.idOutfit}`
+    console.log("body:", req.body)
+    pool.query(`UPDATE cloth_opinion SET Weather_Classification = "${req.body.weatherClassification}", GoodLooks_Calification = ${req.body.goodLooksCalification} WHERE ID = ${req.body.ID}`, (error, results, fields) => {
         if (error) throw error
         
         res.send({message: results})
@@ -89,10 +91,21 @@ app.delete('/cloth-opinion/:idUser/:idOutfit/:idCloth', (req, res) => {
 })
 
 app.get('/cloth-opinion/:idUser/:idOutfit', (req, res) => {
-    pool.query(`SELECT c.ID, co.ID_Cloth, co.ID, co.Weather_Classification, co.GoodLooks_Calification, c.Name, c.Description, c.IMG_Route FROM cloth_opinion as co INNER JOIN cloth AS c ON c.ID = co.ID_Cloth WHERE ID_User = ${req.params.idUser} AND ID_Outfit = ${req.params.idOutfit}`, (error, results, fields) => {
+    //pool.query(`SELECT c.ID, co.ID_Cloth, co.ID, co.Weather_Classification, co.GoodLooks_Calification, c.Name, c.Description, c.IMG_Route FROM cloth_opinion as co INNER JOIN cloth AS c ON c.ID = co.ID_Cloth WHERE ID_User = ${req.params.idUser} AND ID_Outfit = ${req.params.idOutfit}`, (error, results, fields) => {
+    let query = `SELECT co.ID, co.ID_Cloth, co.ID_User, co.Weather_Classification, co.GoodLooks_Calification, co.ID_Outfit, 
+    c.Name, c.Description, c.IMG_Route, c.ClothCategory, c.ClothCategoryName,
+    c.Floral, c.Graphic, c.Striped, c.Embroidered, c.Pleated, c.Solid, c.Lattice,
+    c.Long_Sleeve, c.Short_Sleeve, c.Sleeveless, c.Maxi_Length, c.Mini_Length, c.No_Dress,
+    c.Crew_Neckline, c.V_Neckline, c.Square_Neckline, c.No_Neckline, 
+    c.Denim, c.Chiffon, c.Cotton, c.Leather, c.Faux, c.Knit, c.Tight, c.Loose, c.Conventional
+    FROM cloth_opinion AS co INNER JOIN cloth AS c ON c.ID = co.ID_Cloth WHERE ID_User = ${req.params.idUser} AND ID_Outfit = ${req.params.idOutfit}
+    `
+    
+    pool.query(query, (error, results, fields) => {
         if (error) throw error
-
-        res.send({message: results})
+            result = getClothsWithAttributes(results) 
+            console.log("result:", result)
+            res.send({message: result})
     })
 })
 /**************/
@@ -116,16 +129,47 @@ app.get('/outfits', (req, res) => {
     })
 })
 
-app.get('/outfits/:id', (req, res) => {
-    pool.query(`SELECT ID_Cloth, Name, Description, IMG_Route FROM rel_cloth_outfit INNER JOIN cloth ON cloth.ID = rel_cloth_outfit.ID_Cloth WHERE rel_cloth_outfit.ID_Outfit = ${req.params.id}`, (error, results, fields) => {
-        if (error) throw error
+function getClothsWithAttributes(data) {
+    result = []
+    resultArray = Object.values(JSON.parse(JSON.stringify(data)))
+    for (cloth of resultArray) {
+    //    console.log(Object.keys(cloth))
+        // console.log(Object.values(cloth))
+        i = 0
+        attrs = []
+        n_cloth = {}
+        for (val of Object.values(cloth)) {
+            // console.log("Llave:", Object.keys(cloth)[i], " | Valor:", val)
+            if (val != null && typeof val === 'object') {
+                // console.log(val)
+                if (val.data[0] === 1) {
+                    attrs.push( Object.keys(cloth)[i] )
+                }
+            }
+            else {
+                n_cloth[Object.keys(cloth)[i]] = val
+            }
+            i++
+        }
+        n_cloth.attributes = attrs
+        result.push(n_cloth)
+    }
+    return result
+}
 
-        res.send({message: results})
+app.get('/outfits/:id', (req, res) => {
+    // SELECT ID_Cloth, Name, Description, IMG_Route 
+    pool.query(`SELECT * FROM rel_cloth_outfit INNER JOIN cloth ON cloth.ID = rel_cloth_outfit.ID_Cloth WHERE rel_cloth_outfit.ID_Outfit = ${req.params.id}`, (error, results, fields) => {
+        if (error) throw error
+ 
+        result = getClothsWithAttributes(results)
+           
+        res.send({message: result})
     })
 })
 
 app.post('/outfit-opinion', (req, res) => {
-    values = `${req.body.idOutfit}, ${req.body.idUser}, ${req.body.weatherClassification}, ${req.body.goodLooksCalification}`
+    values = `${req.body.idOutfit}, ${req.body.idUser}, "${req.body.weatherClassification}", ${req.body.goodLooksCalification}`
     pool.query(`INSERT INTO outfit_opinion (ID_Outfit, ID_User, Weather_Classification, GoodLooks_Calification) VALUES (${values})`, (error, results, fields) => {
         if (error) throw error
 
@@ -134,7 +178,7 @@ app.post('/outfit-opinion', (req, res) => {
 })
 
 app.put('/outfit-opinion', (req, res) => {
-    pool.query(`UPDATE outfit_opinion SET Weather_Classification = ${req.body.weatherClassification}, GoodLooks_Calification = ${req.body.goodLooksCalification} WHERE ID = ${req.body.ID}`, (error, results, fields) => {
+    pool.query(`UPDATE outfit_opinion SET Weather_Classification = "${req.body.weatherClassification}", GoodLooks_Calification = ${req.body.goodLooksCalification} WHERE ID = ${req.body.ID}`, (error, results, fields) => {
         if (error) throw error
 
         res.send({message: results})
@@ -203,12 +247,7 @@ app.get('/login/:username/:password', (req, res) => {
 })
 /**************/
 
-https
-    .createServer({
-        key: fs.readFileSync("key.pem"),
-        cert: fs.readFileSync("cert.pem") 
-    }, app)
-    .listen(3000, (error) => {
+app.listen(3000, (error) => {
     if (error) return console.log(`Error: ${error}`)
 
     console.log("Server started")

@@ -1,16 +1,9 @@
 
-const isDevelopment = true
-
-url = "https//10.6.41.56:3000"
-if (isDevelopment) {
-    url = "https://localhost:3000"
-}
 
 if (sessionStorage.getItem('sessionKey')) {
     userId = sessionStorage.getItem('sessionKey')
 
     let currentView = location.href.split('/').slice(-1)[0]
-    console.log(currentView)
     if (currentView == 'rateOutfit.html') {
         i = 0;
         outfits = loadOutfits() 
@@ -19,17 +12,14 @@ if (sessionStorage.getItem('sessionKey')) {
             
             loadCards(array[i++])
         })
-
     }
 
     else {
         idOpinion = currentView.split("=")[1]
         loadUpdateButton()
-        loadOutfitWithOpinion(idOpinion).then(data => {
-            
+        loadOutfitWithOpinion(idOpinion).then(data => {            
             loadOutfitTitles(data)
-            loadClothesId(data.clothes)
-            
+            // loadClothesId(data.clothes)
 
         })
     }
@@ -39,11 +29,11 @@ else
     location.href = "/login.html"
 
 //CARGAR CADA UNA DE LAS CATEGORÍAS OPINADAS
-function loadClothesId(clothes) {
+/*function loadClothesId(clothes) {
     clothes.forEach(cloth => {
         console.log("clothsss:", cloth)
     })
-}
+}*/
 
 function loadOutfitTitles(data) {
     document.querySelector(".outfit-name").innerHTML = data.Name 
@@ -52,7 +42,6 @@ function loadOutfitTitles(data) {
 
 function loadUpdateButton() {
     row = document.querySelector("[flex-container]")
-    console.log("row:",row)
     row.innerHTML = ""
 
     button = `
@@ -63,31 +52,66 @@ function loadUpdateButton() {
 
 
 async function loadOutfitWithOpinion(id) {
-    response = await fetch(`${url}/outfit-opinions/${id}`).then(response => response.json())
+    response = await fetch(`${API_URL}/outfit-opinions/${id}`).then(response => response.json())
     response = response.message[0]
-    console.log(response)
     
-    temp = await fetch(`${url}/cloth-opinion/${userId}/${response.ID_Outfit}`).then(response => response.json())
+    temp = await fetch(`${API_URL}/cloth-opinion/${userId}/${response.ID_Outfit}`).then(response => response.json())
     response.clothes = temp.message
     // currentOutfit = response
-    console.log(":DDD", response)
+
+    document.querySelector(".outfit-data").dataset.outfitId = id
+
+
+    checkedCategories = response.Weather_Classification.split(",")
+    outfitCategories = document.querySelectorAll(".messageCheckbox")
+    outfitCategories.forEach( x => {
+        if (response.Weather_Classification.includes(x.value))
+            x.checked = true
+
+    } )
+    document.getElementById("outfitGoodLooks").value = response.GoodLooks_Calification
+
+    // console.log("checkedCategories", checkedCategories)
 
     cardList = document.querySelector(".card-list")
     cardList.innerHTML = ""
-    response.clothes.forEach(cloth => {
-        cardList.innerHTML += generateCard(cloth)
+    /*
+    response.clothes.forEach(async (cloth) => {
+        clothAttr = await fetch(`${API_URL}/clothes/${cloth.ID}`).then(response => response = response.json())
+        clothAttr = clothAttr.message[0].attributes
+        cloth.attributes = clothAttr
     })
-    
+    */    
     response.clothes.forEach(cloth => {
-        console.log(cloth)
-        selector = document.getElementById(`clothGoodLooks_${cloth.ID_Cloth}`)
-        selector.value = cloth.GoodLooks_Calification//`"${cloth.goodLooksCalification}"`
-        selector = document.getElementById(`clothWeatherClassification_${cloth.ID_Cloth}`)
-        selector.value = cloth.Weather_Classification
+        console.log("Cloth:", cloth )
+        cardList.innerHTML += generateCard(cloth, cloth.Weather_Classification.split(","))
     })
 
-    document.getElementById("outfitGoodLooks").value = response.GoodLooks_Calification
-    document.getElementById("outfitWeatherClassification").value = response.Weather_Classification
+    response.clothes.forEach( x => {
+        node = document.getElementById(`clothGoodLooks_${x.ID_Cloth}`)
+        node.value = x.GoodLooks_Calification
+
+        // data.ID = cardList.children[i].dataset.rid
+
+    })
+    
+    /*
+    response.clothes.forEach(cloth => {
+        // selector = document.getElementById(`clothGoodLooks_${cloth.ID_Cloth}`)
+        // selector.value = cloth.GoodLooks_Calification//`"${cloth.goodLooksCalification}"`
+
+        console.log("Cloth:", cloth)
+        node = document.getElementById(`clothWeatherClassification_${cloth.ID_Cloth}`)
+        console.log("node", node)
+        selector = node.querySelectorAll(".categoriaCheckbox")
+        console.log("SELECTOR", selector)
+        selector.forEach( x=> {
+            if (cloth.Weather_Classification.includes(x.value))
+                x.checked = true
+        }) //value = cloth.Weather_Classification
+    })
+    */
+
     return response
 }
 
@@ -114,20 +138,28 @@ function clearError() {
 async function handleSubmit(isUpdate) {
     clearError()
     outfitId = document.querySelector(".outfit-data").dataset.outfitId
+    console.log("outfitId:", outfitId)
     categoriesChecked = document.querySelectorAll('.messageCheckbox:checked');
     
     outfitGoodLooks = document.getElementById("outfitGoodLooks").value
 
+    let categories = [] 
+    categoriesChecked.forEach( c => {
+        categories.push(c.value)
+    } )
+    categories = categories.join()
+
+    
     if ( categoriesChecked.length == 0 ) {
         displayError()
         return
     }
-    
     if ( !(1 <= outfitGoodLooks && outfitGoodLooks <= 10) )
     {
         displayError()
         return
     }
+    
     
     // verificación de que todos los campos están completados. Sino, retorna
     cardList = document.querySelector(".card-list")
@@ -136,7 +168,6 @@ async function handleSubmit(isUpdate) {
         clothGoodLooks = cardList.children[i].querySelector(".goodLooks").value
         // clothWeatherClassification = cardList.children[i].querySelector(".weatherClassification").value
         categoria = cardList.children[i].querySelector(".categoria")
-        console.log("categoria:", categoria)
 
         if ( categoria.length == 0 ) {
             displayError()
@@ -152,24 +183,22 @@ async function handleSubmit(isUpdate) {
     }
 
     // En este punto, toda la data es valida
-    categoriesChecked.forEach( async node => {
-        data = {
-            idOutfit: outfitId,
-            idUser: userId,
-            weatherClassification: node.value,  //se itera para subir varios registros. Uno por cada categoría definida
-            goodLooksCalification: outfitGoodLooks
-        }
+    data = {
+        idOutfit: outfitId,
+        idUser: userId,
+        weatherClassification: categories,  //se itera para subir varios registros. Uno por cada categoría definida
+        goodLooksCalification: outfitGoodLooks
+    }
 
-        if (isUpdate) {
-            //actualizar
-            console.log("Estoy actualizando")
-            data.ID = idOpinion
-            await putData(`${url}/outfit-opinion`, data)
-    
-        }
-        else
-            await postData(`${url}/outfit-opinion`, data)
-    } )
+    if (isUpdate) {
+        //actualizar
+        data.ID = idOpinion
+        await putData(`${API_URL}/outfit-opinion`, data)
+
+    }
+    else {
+        await postData(`${API_URL}/outfit-opinion`, data)
+    } 
     
 
     // Una vez subida la calificación para el outfit,
@@ -180,26 +209,28 @@ async function handleSubmit(isUpdate) {
         
         clothGoodLooks = cardList.children[i].querySelector(".goodLooks").value
         categoria = cardList.children[i].querySelectorAll(".categoriaCheckbox:checked")
-        console.log("categoria:", categoria)
-        categoria.forEach(async node => {
-            data = {
-                idCloth: cardList.children[i].dataset.clothid,
-                idUser: userId,
-                goodLooksCalification: clothGoodLooks,
-                weatherClassification: node.value,
-                idOutfit: outfitId
-            }
-            console.log(data)
-            if (isUpdate) {
-                // actualizar registros uno a uno
-                console.log(cardList.children[i].dataset.rid)
-                data.ID = cardList.children[i].dataset.rid
-            
-                await putData(`${ruta}/cloth-opinion`, data)
-            }
-            else
-                await postData(`${url}/cloth-opinion`, data)
+        let categories = []
+        categoria.forEach( c => {
+            categories.push(c.value)
         })
+        categories = categories.join()
+        
+        data = {
+            idCloth: cardList.children[i].dataset.clothid,
+            idUser: userId,
+            goodLooksCalification: clothGoodLooks,
+            weatherClassification: categories,
+            idOutfit: outfitId
+        }
+        if (isUpdate) {
+            // actualizar registros uno a uno
+            data.ID = cardList.children[i].dataset.rid
+        
+            await putData(`${API_URL}/cloth-opinion`, data)
+        }
+        else {
+            await postData(`${API_URL}/cloth-opinion`, data)
+        }
     }
 
     if (isUpdate) {
@@ -218,15 +249,94 @@ async function handleSubmit(isUpdate) {
     })
 }
 
-function generateCard(data) {
+
+
+const COLOR_DISENHO = "lime"
+const COLOR_LARGO_DE_MANGAS = "red" 
+const COLOR_LARGO_DE_FALDA = "magenta"
+const COLOR_TIPO_DE_CUELLO = "brown"
+const COLOR_MATERIAL = "blue"
+const COLOR_AJUSTE = "grey"
+
+const ATTRIBUTES_DATA = {
+    //Diseño
+    "floral": ["floral", COLOR_DISENHO], 
+    "graphic": ["gráfico", COLOR_DISENHO], 
+    "striped": ["rayado", COLOR_DISENHO], 
+    "embroidered": ["bordado", COLOR_DISENHO], 
+    "pleated": ["plisado", COLOR_DISENHO], 
+    "solid": ["sólido", COLOR_DISENHO],
+    "lattice": ["patrón celosía", COLOR_DISENHO],
+    //Largo de Mangas
+    "long_sleeve": ["manga larga",COLOR_LARGO_DE_MANGAS], 
+    "short_sleeve": ["manga corta",COLOR_LARGO_DE_MANGAS],
+    "sleeveless": ["sin manga",COLOR_LARGO_DE_MANGAS],
+    //Largo de Falda
+    "maxi_length": ["largo maxi",COLOR_LARGO_DE_FALDA], 
+    "mini_length": ["largo mini",COLOR_LARGO_DE_FALDA], 
+    "no_dress": ["sin vestido",COLOR_LARGO_DE_FALDA],
+    //Tipo de cuello
+    "crew_neckline": ["escote redondo",COLOR_TIPO_DE_CUELLO], 
+    "v_neckline": ["escote en v",COLOR_TIPO_DE_CUELLO], 
+    "square_neckline": ["escote cuadrado",COLOR_TIPO_DE_CUELLO], 
+    "no_neckline": ["sin escote",COLOR_TIPO_DE_CUELLO],
+    //Material
+    "denim": ["vaqueros",COLOR_MATERIAL],
+    "chiffon":["gasa",COLOR_MATERIAL], 
+    "cotton":["algodón",COLOR_MATERIAL], 
+    "leather":["cuero",COLOR_MATERIAL], 
+    "faux":["falso",COLOR_MATERIAL], 
+    "knit":["tejer",COLOR_MATERIAL],
+    //Ajuste
+    "tight": ["apretado",COLOR_AJUSTE],
+    "loose":["suelto",COLOR_AJUSTE],
+    "conventional":["convencional",COLOR_AJUSTE]
+}
+
+function generateHtmlTags(attributes) {
+    let tagList = ""
+    for (attr of attributes) {
+        nametag = ATTRIBUTES_DATA[attr.toLowerCase()][0]
+        newTag = `
+            <div class="tag ${ATTRIBUTES_DATA[attr.toLowerCase()][1]}">
+                ${nametag}
+            </div>
+        `
+        
+        tagList += newTag
+    }
+    return tagList
+}
+
+function generateCard(data, values_checked = []) {
     let id = data.ID != undefined ? data.ID : ''
-    data.Name = data.Name.split("-")[0] 
+    img_name = data.Name.replace("-img", "") 
+
+    CATEGORIAS = ["Frío", "Lluvioso", "Húmedo", "Templado", "Caluroso"]
+    checkboxes = ""
+    for (let i = 0; i < CATEGORIAS.length; i++) {
+        isChecked = ""
+        value = `${i + 1}`
+        if (values_checked.includes(value)) {
+            isChecked = "checked"
+        }
+
+        checkbox = `
+            <label class="p-left">
+                <input class="categoriaCheckbox" type="checkbox" value="${value}" ${isChecked}> ${CATEGORIAS[i]}
+            </label>
+        `
+        checkboxes += checkbox
+    }
+
     newCard = `
-    <div class="card" data-clothId="${data.ID_Cloth}" data-rId=${id}>
-        <img src="../data/Generador de Conjuntos/images/img/${data.IMG_Route}" class="card-img-cloth" alt="${data.Name}">
+    <div class="card" data-clothId="${data.ID_Cloth}" data-rId=${data.ID}>
+        <div class="card-image">
+        <img src="${BASE_ROUTE}/${data.IMG_Route}" class="card-img-cloth" alt="${img_name}"/>
+        </div>
         <div class="card-body">
-            <h5 class="card-title">${data.Name}</h5>
-            <p class="card-text">${data.Description}.</p>
+            <h5 class="card-title">${img_name}</h5>
+            <div class="card-tags">${ generateHtmlTags(data.attributes) }</div>
             
             <label>¿Qué nota le daría a esta prenda?</label>
             <div class="selector">
@@ -247,31 +357,14 @@ function generateCard(data) {
             <br/>
             ¿En qué climas utilizaría esta prenda?
             <div class="categoria" id="clothWeatherClassification_${data.ID_Cloth}" data-clothId="${data.ID_Cloth}">
-              <label class="p-left">
-                <input class="categoriaCheckbox" type="checkbox" value="1"> Frío
-              </label>
-              <label class="p-left">
-                <input class="categoriaCheckbox" type="checkbox" value="2"> Lluvioso
-              </label>
-              <label class="p-left">
-                <input class="categoriaCheckbox" type="checkbox" value="3"> Húmedo
-              </label>
-              <label class="p-left">
-                <input class="categoriaCheckbox" type="checkbox" value="4"> Templado
-              </label>
-              <label class="p-left">
-                <input class="categoriaCheckbox" type="checkbox" value="5"> Caluroso
-              </label>
+                ${checkboxes}
             </div>
-            
-
-        </div>
-    </div>`
+    `
     return newCard
 }
 
 async function loadOutfits() {
-    response = await fetch(`${url}/outfits`)
+    response = await fetch(`${API_URL}/outfits`)
     .then(response => response.json()).then(response => response.message)
     
     return response
@@ -308,17 +401,16 @@ async function loadCards(outfit) {
 }
 
 async function loadOutfit(outfit) {
-    let response = await fetch(`${url}/outfits/${outfit.ID}`)
+    let response = await fetch(`${API_URL}/outfits/${outfit.ID}`)
     .then(response => response.json())
-
     outfit.clothes = response.message
     return outfit
 }
 
 // Example POST method implementation:
-async function postData(url = '', data = {}) {
+async function postData(API_URL = '', data = {}) {
     // Default options are marked with *
-    const response = await fetch(url, {
+    const response = await fetch(API_URL, {
       method: 'POST', // *GET, POST, PUT, DELETE, etc.
       mode: 'cors', // no-cors, *cors, same-origin
       cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
@@ -328,20 +420,22 @@ async function postData(url = '', data = {}) {
         // 'Content-Type': 'application/x-www-form-urlencoded',
       },
       redirect: 'follow', // manual, *follow, error
-      referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+      referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-API_URL
       body: JSON.stringify(data) // body data type must match "Content-Type" header
     });
     return response.json(); // parses JSON response into native JavaScript objects
 }
 
-async function putData(url = '', data = {}) {
-    console.log("putData", data)
-    const response = await fetch(url, {
+async function putData(API_URL = '', data = {}) {
+    console.log("PUT data:", data)
+    const response = await fetch(API_URL, {
         method: 'PUT', 
-        mode: 'cors',
+        mode: 'cors',   
         cache: 'no-cache',
         credentials: 'same-origin',
         headers: {
+            // 'Access-Control-Allow-Origin': '*',
+
             'Content-Type': 'application/json'
         },
         redirect: 'follow',
@@ -361,11 +455,8 @@ function logOut() {
 
 async function hasOpinated() {
     outfitData = document.querySelector(".outfit-data")
-    console.log(outfitData)
     let idOutfit = outfitData.dataset.outfitId
-    console.log("id outfit:", idOutfit)
-    let response = await fetch(`${url}/outfit-opinion/${userId}/${idOutfit}`).then(response => response.json())
-    console.log("response:", response)
+    let response = await fetch(`${API_URL}/outfit-opinion/${userId}/${idOutfit}`).then(response => response.json())
     
     return response.message.status
         if (result.message.status === true) {
